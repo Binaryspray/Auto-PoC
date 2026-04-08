@@ -1,0 +1,23 @@
+{
+  "project_id": "test_project",
+  "target": {
+    "subdomain": "api.example.com",
+    "attack_point": "/api/v1/users"
+  },
+  "vulnerability": {
+    "type": "IDOR",
+    "payload": "GET /api/v1/users/1337 with Authorization: Bearer <other_user_token>",
+    "test_result": "200 OK - returned user 1337's PII (email, phone, address) using another user's token",
+    "reproduction_steps": [
+      "Login as user A and capture the Bearer token",
+      "Send GET /api/v1/users/{victim_id} with user A's token",
+      "Observe that the response contains victim's PII without authorization check"
+    ]
+  },
+  "program_info": {
+    "platform": "hackerone",
+    "program_name": "Example Corp",
+    "scope": ["*.example.com", "api.example.com"],
+    "report_template": null
+  }
+}
