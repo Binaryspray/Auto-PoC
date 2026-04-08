@@ -84,9 +84,11 @@ def _query_codex(prompt: str) -> str:
         raise RuntimeError("codex CLI가 설치되어있지 않습니다.")
 
     result = subprocess.run(
-        ["codex", "exec", "--full-auto", "--skip-git-repo-check", "-q", prompt],
+        ["codex", "exec", "--full-auto", "--skip-git-repo-check", prompt],
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         timeout=120,
     )
     if result.returncode != 0:
