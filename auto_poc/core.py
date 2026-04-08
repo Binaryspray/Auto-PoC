@@ -1,15 +1,20 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from auto_poc.context import load_existing_reports
-from auto_poc.generator import DEFAULT_MODEL, generate_report_via_llm
+from auto_poc.generator import (
+    DEFAULT_BACKEND,
+    DEFAULT_MODEL,
+    DEFAULT_PROVIDER,
+    generate_report_via_llm,
+)
 from auto_poc.postprocessor import save_report, validate_and_build_report
 from auto_poc.preprocessor import get_report_template, resolve_asset, validate_input
 
 
 def generate_report(
     input_data: dict,
+    backend: str = DEFAULT_BACKEND,
+    provider: str = DEFAULT_PROVIDER,
     model: str = DEFAULT_MODEL,
     save: bool = True,
 ) -> dict:
@@ -27,6 +32,8 @@ def generate_report(
         asset=asset,
         report_template=template,
         existing_reports=existing_reports,
+        backend=backend,
+        provider=provider,
         model=model,
     )
 

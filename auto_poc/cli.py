@@ -7,7 +7,7 @@ import sys
 from dotenv import load_dotenv
 
 from auto_poc.core import generate_report
-from auto_poc.generator import DEFAULT_MODEL
+from auto_poc.generator import DEFAULT_BACKEND, DEFAULT_MODEL, DEFAULT_PROVIDER
 
 
 def main() -> None:
@@ -26,10 +26,23 @@ def main() -> None:
         help="Path to write output JSON (prints to stdout if omitted)",
     )
     parser.add_argument(
+        "--backend", "-b",
+        type=str,
+        default=DEFAULT_BACKEND,
+        choices=["cli", "api"],
+        help=f"LLM backend: cli or api (default: {DEFAULT_BACKEND})",
+    )
+    parser.add_argument(
+        "--provider", "-p",
+        type=str,
+        default=DEFAULT_PROVIDER,
+        help=f"CLI provider: claude or codex (default: {DEFAULT_PROVIDER})",
+    )
+    parser.add_argument(
         "--model", "-m",
         type=str,
         default=DEFAULT_MODEL,
-        help=f"LLM model to use (default: {DEFAULT_MODEL})",
+        help=f"API model for --backend api (default: {DEFAULT_MODEL})",
     )
     parser.add_argument(
         "--no-save",
@@ -49,6 +62,8 @@ def main() -> None:
     # 보고서 생성
     report = generate_report(
         input_data=input_data,
+        backend=args.backend,
+        provider=args.provider,
         model=args.model,
         save=not args.no_save,
     )
