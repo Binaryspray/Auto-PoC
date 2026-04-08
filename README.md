@@ -10,7 +10,7 @@ Solve 단계의 취약점 테스트 결과를 입력받아, LLM 기반으로 Hac
 - CWE 및 MITRE ATT&CK TTPs 자동 매핑
 - 기존 보고서 기반 취약점 체이닝 분석
 - CWE ID 유효성 검증 (할루시네이션 방지)
-- 다중 LLM 지원 (Claude, Gemini, GPT 등 — LiteLLM 기반)
+- 다중 LLM 지원: CLI 백엔드 (Claude Code, Codex) + API 백엔드 (LiteLLM)
 
 ## 설치
 
@@ -28,29 +28,40 @@ pip install -r requirements.txt
 
 ## 환경 설정
 
-`.env.example`을 복사하여 `.env` 파일을 생성하고, API 키를 입력합니다.
+`.env.example`을 복사하여 `.env` 파일을 생성합니다.
 
 ```bash
 cp .env.example .env
 ```
 
 ```env
-# 사용할 LLM 프로바이더의 키만 설정하면 됩니다
-ANTHROPIC_API_KEY=sk-ant-...
-GEMINI_API_KEY=...
-OPENAI_API_KEY=sk-...
+# ── 백엔드 설정 ──
+LLM_BACKEND=cli          # cli (기본값) 또는 api
+
+# ── CLI 모드 설정 ──
+LLM_PROVIDER=claude       # claude (기본값) 또는 codex
+
+# ── API 모드 설정 ──
+LLM_MODEL=claude-sonnet-4-20250514
+# ANTHROPIC_API_KEY=sk-ant-...
+# GEMINI_API_KEY=AIzaSy...
+# OPENAI_API_KEY=sk-...
 ```
 
 ## 사용법
 
-### CLI
+두 가지 백엔드를 지원합니다:
+- **CLI 백엔드** (기본값) — `claude` 또는 `codex` CLI를 직접 호출. API 키 불필요, 기존 구독 활용.
+- **API 백엔드** — LiteLLM을 통해 Claude, Gemini, GPT 등 호출. API 키 필요.
+
+### CLI 백엔드 (기본값)
 
 ```bash
-# 기본 실행 (Claude)
+# Claude Code CLI 사용 (기본값)
 python -m auto_poc -i input.json
 
-# Gemini 모델 사용
-python -m auto_poc -i input.json -m gemini/gemini-2.0-flash
+# Codex CLI 사용
+python -m auto_poc -i input.json -p codex
 
 # 출력 파일 지정
 python -m auto_poc -i input.json -o report.json
@@ -59,12 +70,29 @@ python -m auto_poc -i input.json -o report.json
 python -m auto_poc -i input.json --no-save
 ```
 
+### API 백엔드
+
+```bash
+# Gemini API 사용
+python -m auto_poc -i input.json -b api -m gemini/gemini-2.5-flash
+
+# Claude API 사용
+python -m auto_poc -i input.json -b api -m claude-sonnet-4-20250514
+
+# OpenAI API 사용
+python -m auto_poc -i input.json -b api -m gpt-4o
+```
+
 ### 라이브러리
 
 ```python
 from auto_poc import generate_report
 
-report = generate_report(input_data, model="gemini/gemini-2.0-flash")
+# CLI 백엔드 (기본값)
+report = generate_report(input_data)
+
+# API 백엔드
+report = generate_report(input_data, backend="api", model="gemini/gemini-2.5-flash")
 ```
 
 ## 입력 JSON 형식
@@ -107,11 +135,26 @@ report = generate_report(input_data, model="gemini/gemini-2.0-flash")
     "summary": "...",
     "steps_to_reproduce": ["..."],
     "recommendations": ["..."],
-    "references": ["..."]
+    "references": ["..."],
+    "chaining_analysis": {
+      "status": "suggested",
+      "related_reports": ["report_20260408_031758.json"],
+      "scenario": "브루트포스로 계정 탈취 → IDOR로 전체 PII 열람",
+      "chained_severity": "critical"
+    }
   },
   "impact": "...",
   "attachments": []
 }
+```
+
+### 체이닝 분석 상태
+
+| status | 의미 |
+|---|---|
+| `suggested` | LLM이 추론한 체이닝 가능성 (Auto-PoC 단계) |
+| `unverified` | 사람이 검토했지만 아직 테스트 안 함 |
+| `verified` | Solve에서 실제 체이닝 테스트 완료 |
 ```
 
 ## 프로젝트 구조
