@@ -1,0 +1,23 @@
+{
+  "project_id": "test_project",
+  "target": {
+    "subdomain": "api.example.com",
+    "attack_point": "/api/v1/auth/login"
+  },
+  "vulnerability": {
+    "type": "Broken Authentication",
+    "payload": "POST /api/v1/auth/login with brute-force password list",
+    "test_result": "No rate limiting - 1000 attempts in 60 seconds without lockout",
+    "reproduction_steps": [
+      "Send repeated POST requests to /api/v1/auth/login with varying passwords",
+      "Observe no rate limiting or lockout after N failed attempts",
+      "Successfully brute-force a valid credential pair"
+    ]
+  },
+  "program_info": {
+    "platform": "hackerone",
+    "program_name": "Example Corp",
+    "scope": ["*.example.com"],
+    "report_template": null
+  }
+}

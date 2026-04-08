@@ -14,6 +14,10 @@ def validate_and_build_report(raw_report: dict) -> PocReport:
         raw_report.setdefault("weakness", {})["cwe_id"] = None
         raw_report["weakness"]["cwe_name"] = None
 
+    chaining = raw_report.get("description", {}).get("chaining_analysis")
+    if chaining is not None:
+        chaining["status"] = "suggested"
+
     return PocReport.model_validate(raw_report)
 
 

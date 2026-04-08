@@ -1,0 +1,24 @@
+{
+  "project_id": "test_project",
+  "target": {
+    "subdomain": "cdn.otherdomain.com",
+    "attack_point": "/static/uploads"
+  },
+  "vulnerability": {
+    "type": "Unrestricted File Upload",
+    "payload": "POST /static/uploads with Content-Type: image/png containing embedded PHP webshell",
+    "test_result": "200 OK - file uploaded and accessible at /static/uploads/shell.php, server executed PHP code",
+    "reproduction_steps": [
+      "Navigate to the file upload feature at cdn.otherdomain.com/static/uploads",
+      "Upload a .php file disguised with a .png extension and image/png Content-Type",
+      "Access the uploaded file directly via URL",
+      "Observe that the server executes the PHP code instead of serving it as static content"
+    ]
+  },
+  "program_info": {
+    "platform": "hackerone",
+    "program_name": "Other Corp",
+    "scope": ["*.otherdomain.com"],
+    "report_template": null
+  }
+}

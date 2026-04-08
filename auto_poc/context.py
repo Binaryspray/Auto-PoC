@@ -16,6 +16,8 @@ def load_existing_reports(project_id: str) -> list[dict]:
     reports = []
     for report_file in sorted(reports_dir.glob("report_*.json")):
         with open(report_file, encoding="utf-8") as f:
-            reports.append(json.load(f))
+            data = json.load(f)
+            data["_filename"] = report_file.name
+            reports.append(data)
 
     return reports

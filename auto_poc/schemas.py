@@ -49,11 +49,25 @@ class Weakness(BaseModel):
     cwe_name: Optional[str] = None
 
 
+class ChainingStatus(str, Enum):
+    SUGGESTED = "suggested"
+    UNVERIFIED = "unverified"
+    VERIFIED = "verified"
+
+
+class ChainingAnalysis(BaseModel):
+    status: ChainingStatus = ChainingStatus.SUGGESTED
+    related_reports: list[str] = Field(default_factory=list)
+    scenario: str = ""
+    chained_severity: Optional[Severity] = None
+
+
 class Description(BaseModel):
     summary: str
     steps_to_reproduce: list[str]
     recommendations: list[str] = Field(default_factory=list)
     references: list[str] = Field(default_factory=list)
+    chaining_analysis: Optional[ChainingAnalysis] = None
 
 
 class PocReport(BaseModel):
